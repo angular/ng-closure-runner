@@ -1,4 +1,5 @@
 build/
+.gradle/
 
 # Test output noise
 TESTS-TestSuites.xml
