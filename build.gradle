@@ -1,0 +1,34 @@
+apply plugin: 'java'
+apply plugin: 'distribution'
+
+sourceCompatibility = 1.6
+version = '0.1.1'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile 'com.google.javascript:closure-compiler:v20130603'
+  testCompile 'junit:junit:4.+'
+}
+
+sourceSets {
+  main {
+    java.srcDir "$projectDir/src"
+  }
+  test {
+    java.srcDir "$projectDir/test"
+  }
+}
+
+jar {
+  archiveName 'ngcompiler.jar'
+}
+jar.dependsOn test
+
+distZip {
+  destinationDir new File('assets')
+  archiveName 'ng-closure-runner.zip'
+  from project.files('LICENSE', 'README.md', jar.outputs.files)
+}
