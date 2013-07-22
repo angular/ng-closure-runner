@@ -48,7 +48,7 @@ class MinerrPass extends AbstractPostOrderCallback implements CompilerPass {
     "      prefix = '[' + (module ? module + ':' : '') + code + '] ',\n" +
     "      message,\n" +
     "      i = 1;\n" +
-    "    message = prefix + 'MINERR_URL' + (module ? module + '/' : '') + code;\n" +
+    "    message = prefix + 'MINERR_URL' + (module ? module + 'MINERR_SEPARATOR' : '') + code;\n" +
     "    for(; i < arguments.length; i++) {\n" +
     "      message = message + (i == 1 ? '?' : '&') + 'p' + (i-1) + '=' + stringify(arguments[i]);\n" +
     "    }\n" +
@@ -79,8 +79,14 @@ class MinerrPass extends AbstractPostOrderCallback implements CompilerPass {
     this(compiler, errorConfigOutput, null);
   }
 
+  static String substituteInSource(String url, String separator) {
+    return MINERR_SOURCE
+            .replace("MINERR_URL", url)
+            .replace("MINERR_SEPARATOR", separator);
+  }
+
   static String substituteInSource(String url) {
-    return MINERR_SOURCE.replace("MINERR_URL", url);
+    return substituteInSource(url, "/");
   }
 
   private Node createSubstituteMinerrDefinition() {
