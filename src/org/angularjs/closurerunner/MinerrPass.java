@@ -50,7 +50,7 @@ class MinerrPass extends AbstractPostOrderCallback implements CompilerPass {
     "      i = 1;\n" +
     "    message = prefix + 'MINERR_URL' + (module ? module + 'MINERR_SEPARATOR' : '') + code;\n" +
     "    for(; i < arguments.length; i++) {\n" +
-    "      message = message + (i == 1 ? '?' : '&') + 'p' + (i-1) + '=' + stringify(arguments[i]);\n" +
+    "      message = message + (i == 1 ? '?' : '&') + 'p' + (i-1) + '=' + encodeURIComponent(stringify(arguments[i]));\n" +
     "    }\n" +
     "    return new Error(message); }; }";
 
