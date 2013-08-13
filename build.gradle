@@ -22,10 +22,16 @@ sourceSets {
   }
 }
 
+task copyAssets(type: Copy) {
+  from 'src/minErr.js'
+  into { 'build/classes/main' }
+}
+
 jar {
   archiveName 'ngcompiler.jar'
 }
 jar.dependsOn test
+jar.dependsOn copyAssets
 
 distZip {
   destinationDir new File('assets')
