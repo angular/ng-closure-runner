@@ -32,29 +32,7 @@ class MinerrPass extends AbstractPostOrderCallback implements CompilerPass {
   private Node minerrDefNode;
   private String minerrDefSource;
 
-  static final String MINERR_SOURCE = 
-    "function minErr(module) {\n" +
-    "  var stringify = function (arg) {\n" +
-    "    if (typeof arg == 'function') {\n" +
-    "      return arg.toString().replace(/ \\{[\\s\\S]*$/, '');\n" +
-    "    } else if (typeof arg == 'undefined') {\n" +
-    "      return 'undefined';\n" +
-    "    } else if (!(typeof arg == 'string')) {\n" +
-    "      return JSON.stringify(arg);\n" +
-    "    }\n" +
-    "    return arg; };\n" +
-    "  return function () {\n" +
-    "    var code = arguments[0],\n" +
-    "      prefix = '[' + (module ? module + ':' : '') + code + '] ',\n" +
-    "      message,\n" +
-    "      i = 1;\n" +
-    "    message = prefix + 'MINERR_URL' + (module ? module + 'MINERR_SEPARATOR' : '') + code;\n" +
-    "    for(; i < arguments.length; i++) {\n" +
-    "      message = message + (i == 1 ? '?' : '&') + 'p' + (i-1) + '=' + encodeURIComponent(stringify(arguments[i]));\n" +
-    "    }\n" +
-    "    return new Error(message); }; }";
-
-  static final DiagnosticType THROW_IS_NOT_MINERR_ERROR_WARNING = 
+  static final DiagnosticType THROW_IS_NOT_MINERR_ERROR_WARNING =
       DiagnosticType.warning("JSC_THROW_IS_NOT_MINERR_ERROR_WARNING",
           "Throw expression is not a minErr instance.");
 
@@ -79,14 +57,10 @@ class MinerrPass extends AbstractPostOrderCallback implements CompilerPass {
     this(compiler, errorConfigOutput, null);
   }
 
-  static String substituteInSource(String url, String separator) {
-    return MINERR_SOURCE
+  static String substituteInCode(String code, String url, String separator) {
+    return code
             .replace("MINERR_URL", url)
             .replace("MINERR_SEPARATOR", separator);
-  }
-
-  static String substituteInSource(String url) {
-    return substituteInSource(url, "/");
   }
 
   private Node createSubstituteMinerrDefinition() {

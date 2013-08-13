@@ -9,11 +9,13 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.CustomPassExecutionTime;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class NgClosureRunner extends CommandLineRunner {
 
@@ -38,14 +40,32 @@ public class NgClosureRunner extends CommandLineRunner {
     this.minerrUrl = minerrUrl;
   }
 
+  private String loadTextResource(String asset) throws IOException {
+    InputStream stream = getClass().getClassLoader().getResourceAsStream(asset);
+    int size = stream.available();
+    Scanner input = new Scanner(stream);
+    StringBuilder buf = new StringBuilder(size);
+    String lineSeparator = System.getProperty("line.separator");
+
+    try {
+      while(input.hasNextLine()) {
+        buf.append(input.nextLine() + lineSeparator);
+      }
+      return buf.toString();
+    } finally {
+      input.close();
+    }
+  }
+
   private CompilerPass createMinerrPass() throws IOException {
     AbstractCompiler compiler = createCompiler();
     PrintStream output = new PrintStream(minerrErrors);
+    String code = loadTextResource("minErr.js");
 
     if (minerrUrl != null) {
       return new MinerrPass(compiler,
                             output,
-                            MinerrPass.substituteInSource(minerrUrl, minerrSeparator));
+                            MinerrPass.substituteInCode(code, minerrUrl, minerrSeparator));
     }
     return new MinerrPass(compiler, output);
   }
