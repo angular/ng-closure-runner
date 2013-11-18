@@ -21,17 +21,20 @@ public class NgClosureRunner extends CommandLineRunner {
 
   private boolean minerrPass;
   private String minerrErrors, minerrUrl, minerrSeparator;
+  private String minerrJsResourcePath;
   private Compiler cachedCompiler;
 
-  protected NgClosureRunner(String[] args, 
-                            boolean minerrPass, 
-                            String minerrErrors, 
+  protected NgClosureRunner(String[] args,
+                            boolean minerrPass,
+                            String minerrErrors,
                             String minerrUrl,
-                            String minerrSeparator) {
+                            String minerrSeparator,
+                            String minerrJsResourcePath) {
     super(args);
     this.minerrPass = minerrPass;
     this.minerrSeparator = minerrSeparator;
-    
+    this.minerrJsResourcePath = minerrJsResourcePath;
+
     if (minerrErrors != null) {
       this.minerrErrors = minerrErrors;
     } else {
@@ -60,12 +63,12 @@ public class NgClosureRunner extends CommandLineRunner {
   private CompilerPass createMinerrPass() throws IOException {
     AbstractCompiler compiler = createCompiler();
     PrintStream output = new PrintStream(minerrErrors);
-    String code = loadTextResource("minErr.js");
+    String code = loadTextResource(minerrJsResourcePath);
 
     if (minerrUrl != null) {
-      return new MinerrPass(compiler,
-                            output,
-                            MinerrPass.substituteInCode(code, minerrUrl, minerrSeparator));
+      return new MinerrPass(
+          compiler, output,
+          MinerrPass.substituteInCode(code, minerrUrl, minerrSeparator));
     }
     return new MinerrPass(compiler, output);
   }
@@ -101,7 +104,10 @@ public class NgClosureRunner extends CommandLineRunner {
 
   public static void main(String[] args) {
     boolean minerrPass = false;
-    String minerrErrors = "errors.json", minerrUrl = null, minerrSeparator = "/";
+    String minerrErrors = "errors.json";
+    String minerrUrl = null;
+    String minerrSeparator = "/";
+    String minerrJsResourcePath = "minErr.js";
     List<String> passthruArgs = new ArrayList<String>();
 
     for (int i = 0; i < args.length; i++) {
@@ -114,13 +120,17 @@ public class NgClosureRunner extends CommandLineRunner {
         minerrUrl = args[++i];
       } else if (arg.equals("--minerr_separate_with_colon")) {
         minerrSeparator = ":";
+      } else if (arg.equals("--minerr_js_resource_path")) {
+        minerrJsResourcePath = args[++i];
       } else {
         passthruArgs.add(arg);
       }
     }
 
-    NgClosureRunner runner = new NgClosureRunner(passthruArgs.toArray(new String[]{}), 
-      minerrPass, minerrErrors, minerrUrl, minerrSeparator);
+    NgClosureRunner runner = new NgClosureRunner(
+        passthruArgs.toArray(new String[]{}),
+        minerrPass, minerrErrors, minerrUrl, minerrSeparator,
+        minerrJsResourcePath);
 
     if (runner.shouldRunCompiler()) {
       runner.run();
