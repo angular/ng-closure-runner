@@ -192,7 +192,9 @@ class MinerrPass extends AbstractPostOrderCallback implements CompilerPass {
     }
 
     if (minerrDefNode != null && minerrDefSource != null) {
-      minerrDefNode.getParent().replaceChild(minerrDefNode, createSubstituteMinerrDefinition());
+      Node newMinErrDef = createSubstituteMinerrDefinition();
+      newMinErrDef.useSourceInfoFromForTree(minerrDefNode);
+      minerrDefNode.getParent().replaceChild(minerrDefNode, newMinErrDef);
       codeChanged = true;
     }
 
