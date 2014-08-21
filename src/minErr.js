@@ -1,4 +1,5 @@
-function minErr(module) {
+function minErr(module, ErrorConstructor) {
+  ErrorConstructor = ErrorConstructor || Error;
   var stringify = function (arg) {
     if (typeof arg == 'function') {
       return arg.toString().replace(/ \{[\s\S]*$/, '');
@@ -19,6 +20,6 @@ function minErr(module) {
       message = message + (i == 1 ? '?' : '&') + 'p' + (i-1) + '=' +
         encodeURIComponent(stringify(arguments[i]));
     }
-    return new Error(message);
+    return new ErrorConstructor(message);
   };
 }
